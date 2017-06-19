@@ -1,0 +1,4 @@
+daemonize==2.4.7
+html2text==2016.9.19
+inotify==0.2.8
+lxml==3.8.0
