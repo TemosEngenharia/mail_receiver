@@ -14,9 +14,9 @@ from parsers.servicenow import parserServiceNow as parseSN
 
 pid = '/tmp/mailmon_manual.pid'
 
-logdirfile = '/var/log/odoo-prd/mailmon_manual.log'
+logdirfile = '/var/log/odoo_prd/mailmon_manual.log'
 
-mon_dir = '/opt/odoo-prd/Maildir/manual'
+mon_dir = '/opt/odoo_prd/Maildir/manual'
 
 # Criando o log da aplicação
 logger = logging.getLogger('MailMonManual')
@@ -65,6 +65,7 @@ def parsemail(_mailfile):
     logger.info('To: %s' % mail.to_)
     logger.info('From: %s' % mail.from_)
     if 'reports@latam.officeTrack.com' in mail.from_:
+        print(source)
         destination = parseOT(_mailfile, mail)
         logger.info('OfficeTrack: Destination is %s' % destination)
         rename(source, destination)
@@ -109,11 +110,11 @@ def main():
 
 
 if __name__ == '__main__':
-    daemon = Daemonize(
-        app='mailmon',
-        pid=pid,
-        action=main,
-        keep_fds=keep_fds
-    )
-    daemon.start()
-    #main()
+    #daemon = Daemonize(
+    #    app='mailmon',
+    #    pid=pid,
+    #    action=main,
+    #    keep_fds=keep_fds
+    #)
+    #daemon.start()
+    main()

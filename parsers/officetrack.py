@@ -10,18 +10,12 @@ from datetime import date
 from lxml import etree
 
 
-"""
-Variáveis para acesso ao Banco de Dados
-"""
-dbHost = "127.0.0.1"
-dbName = "temosportal"
-dbUser = "temos"
-dbPass = "tw28()KP"
-
 
 def saveXML(_attach, _mail, _dest):
     if _dest == 'Corretiva':
         filename = '/opt/files/xmls/mco/MCO01_' + _mail + '.xml'
+    elif _dest == 'IPO': #INSTALAÇÃO DE POSTO #ATT 20170621-1219
+        filename = '/opt/files/xmls/ipo/IPO01_' + _mail + '.xml' #INSTALAÇÃO DE POSTO #ATT 20170621-1219
     elif _dest == 'Preventiva':
         filename = '/opt/files/xmls/preventivas/PRV01_' + _mail + '.xml'
     elif _dest == 'PunchIn':
@@ -96,14 +90,16 @@ def getEntryType(_xml):
 
 
 def parserOfficeTrack(_source, _mail):
+    print(_source)
     attach = b64decode(_mail.attachments_list[0]['payload'])
     xml = etree.fromstring(attach)
     FormName = getFormName(xml)
+    print(FormName)
 
     if 'new' in _source:
-        Filename = _source.replace('/opt/odoo-prd/Maildir/new/', '')
+        Filename = _source.replace('/opt/odoo_prd/Maildir/new/', '')
     elif 'manual' in _source:
-        Filename = _source.replace('/opt/odoo-prd/Maildir/manual/', '')
+        Filename = _source.replace('/opt/odoo_prd/Maildir/manual/', '')
 
     if getEntryType(xml) == '21':
         saveXML(attach, Filename, 'PunchIn')
@@ -125,6 +121,8 @@ def parserOfficeTrack(_source, _mail):
             saveXML(attach, Filename, 'Corretiva')
         elif 'Manutenção Preventiva' in FormName:
             saveXML(attach, Filename, 'Preventiva')
+        elif 'IPO' in FormName: #INSTALAÇÃO DE POSTO #ATT 20170621-1219
+            saveXML(attach, Filename, 'IPO')
         elif 'Survey Instalação' in FormName:
             saveXML(attach, Filename, 'SurveyInst')
         elif 'AsBuilt' in FormName:

@@ -14,9 +14,9 @@ from parsers.servicenow import parserServiceNow as parseSN
 
 pid = '/tmp/mailmon.pid'
 
-logdirfile = '/var/log/odoo-prd/mailmon.log'
+logdirfile = '/var/log/odoo_prd/mailmon.log'
 
-mon_dir = '/opt/odoo-prd/Maildir/new'
+mon_dir = '/opt/odoo_prd/Maildir/new'
 
 # Criando o log da aplicação
 logger = logging.getLogger('MailMon')
