@@ -5,7 +5,7 @@ import logging.handlers
 import os
 import time
 
-from lxml import etree
+import lxml
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +89,7 @@ def getEntryType(_xml):
 def parserOfficeTrack(_source, _mail):
     print(_source)
     attach = b64decode(_mail.attachments_list[0]['payload'])
-    xml = etree.fromstring(attach)
+    xml = lxml.etree.fromstring(attach)
     FormName = getFormName(xml)
 
     if FormName is None:
