@@ -7,33 +7,7 @@ import time
 
 from lxml import etree
 
-<<<<<<< HEAD
-
-def saveXML(_attach, _mail, _dest):
-    if _dest == 'Corretiva':
-        filename = '/opt/files/xmls/mco/MCO01_' + _mail + '.xml'
-    elif _dest == 'IPO': #INSTALAÇÃO DE POSTO #ATT 20170621-1219
-        filename = '/opt/files/xmls/ipo/IPO01_' + _mail + '.xml' #INSTALAÇÃO DE POSTO #ATT 20170621-1219
-    elif _dest == 'Preventiva':
-        filename = '/opt/files/xmls/preventivas/PRV01_' + _mail + '.xml'
-    elif _dest == 'PunchIn':
-        filename = '/opt/files/xmls/punchin/PIN01_' + _mail + '.xml'
-    elif _dest == 'PunchOut':
-        filename = '/opt/files/xmls/punchout/POU01_' + _mail + '.xml'
-    elif _dest == 'StartTask':
-        filename = '/opt/files/xmls/starttask/STA01_' + _mail + '.xml'
-    elif _dest == 'CloseTask':
-        filename = '/opt/files/xmls/closetask/CTA01_' + _mail + '.xml'
-    elif _dest == 'TaskNotDone':
-        filename = '/opt/files/xmls/tasknotdone/TND01_' + _mail + '.xml'
-    else:
-        filename = '/opt/files/xmls/outros/' + _mail + '.xml'
-    with open(filename, 'wb') as f:
-        f.write(_attach)
-=======
 logger = logging.getLogger(__name__)
->>>>>>> develop
-
 
 def getFormName(_xml):
     _FormName = _xml.find('Form/Name')
@@ -117,111 +91,72 @@ def parserOfficeTrack(_source, _mail):
     attach = b64decode(_mail.attachments_list[0]['payload'])
     xml = etree.fromstring(attach)
     FormName = getFormName(xml)
-    print(FormName)
 
-<<<<<<< HEAD
-    if 'new' in _source:
-        Filename = _source.replace('/opt/odoo_prd/Maildir/new/', '')
-    elif 'manual' in _source:
-        Filename = _source.replace('/opt/odoo_prd/Maildir/manual/', '')
+    if FormName is None:
+        _TypeForm = 'outros'
+        _FormVersion = '01'
+        Filename = os.path.basename(_source)
+        return saveXML(attach, Filename, _TypeForm, _FormVersion, _source)
 
-    if getEntryType(xml) == '21':
-        saveXML(attach, Filename, 'PunchIn')
-    elif getEntryType(xml) == '22':
-        saveXML(attach, Filename, 'PunchOut')
-    elif getEntryType(xml) == '23':
-        saveXML(attach, Filename, 'StartTask')
-    elif getEntryType(xml) == '24':
-        saveXML(attach, Filename, 'Outro')
-    elif getEntryType(xml) == '25':
-        saveXML(attach, Filename, 'Outro')
-    elif getEntryType(xml) == '26':
-        saveXML(attach, Filename, 'CloseTask')
-    elif getEntryType(xml) == '29':
-        saveXML(attach, Filename, 'TaskNotDone')
-    elif getEntryType(xml) == '33':
-        FormName = getFormName(xml)
-        if 'Manutenção Corretiva' in FormName:
-            saveXML(attach, Filename, 'Corretiva')
-        elif 'Manutenção Preventiva' in FormName:
-            saveXML(attach, Filename, 'Preventiva')
-        elif 'IPO' in FormName: #INSTALAÇÃO DE POSTO #ATT 20170621-1219
-            saveXML(attach, Filename, 'IPO')
-        elif 'Survey Instalação' in FormName:
-            saveXML(attach, Filename, 'SurveyInst')
-        elif 'AsBuilt' in FormName:
-            saveXML(attach, Filename, 'AsBuilt')
-=======
-    try:
-        split_FormName = FormName.split('|')
-    except:
-        
-        
+    split_FormName = FormName.split('|')
     len_split_FormName = len(split_FormName)
-    if len_split_FormName == 0:
-        
-    elif len_split_FormName == 1:
-        pass
-    elif len_split_FormName == 2:
-        pass
-    elif len_split_FormName > 2:
-        pass
-        
 
-    try:
-        _TypeForm = FormName.split('|')[1].strip()
-        _FormVersion = FormName.split('|')[2].strip()
-    except:
-        if FormName is None:
-            _TypeForm = 'outros'
-            _FormVersion = '01'
-        elif 'Manutenção Corretiva' in FormName:
-            _TypeForm = 'MCO'
-            _FormVersion = '01'
-        elif 'AÇÕES' in FormName:
+    if len_split_FormName == 1:
+        if 'AÇÕES' in FormName:
             _TypeForm = 'antigas/melhorias'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'AJUSTE' in FormName:
             _TypeForm = 'antigas/ajuste915'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'ASBUILT' in FormName:
             _TypeForm = 'antigas/asbuilt'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'CORRETIVA' in FormName:
             _TypeForm = 'antigas/corretivas'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'ICR' in FormName:
             _TypeForm = 'antigas/icr'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'INSTALAÇÃO' in FormName:
             _TypeForm = 'antigas/instalacaoposto'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'INVENTÁRIO' in FormName:
             _TypeForm = 'antigas/inventario'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'PLANO' in FormName:
             _TypeForm = 'antigas/planoverao'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'PREVENTIVA' in FormName:
             _TypeForm = 'antigas/preventivas'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'RETIRADA' in FormName:
             _TypeForm = 'antigas/retirada58'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'SINALIZAÇÃO' in FormName:
             _TypeForm = 'antigas/sinalizacao'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'SURVEY' in FormName:
             _TypeForm = 'antigas/survey'
-            _FormVersion = '01'
+            _FormVersion = 'P01'
         elif 'NÃO':
             _TypeForm = 'TND'
-            _FormVersion = '01'
->>>>>>> develop
+            _FormVersion = 'P01'
         else:
             _TypeForm = 'outros'
-            _FormVersion = '01'
-
-    Filename = os.path.basename(_source)
-
-    return saveXML(attach, Filename, _TypeForm, _FormVersion, _source)
+            _FormVersion = 'P01'
+        Filename = os.path.basename(_source)
+        return saveXML(attach, Filename, _TypeForm, _FormVersion, _source)
+    elif len_split_FormName == 2:
+        if 'Manutenção Corretiva' in FormName:
+            _TypeForm = 'MCO'
+            _FormVersion = FormName.split('|')[1].strip()
+        else:
+            _TypeForm = 'outros'
+            _FormVersion = 'P01'
+        Filename = os.path.basename(_source)
+        return saveXML(attach, Filename, _TypeForm, _FormVersion, _source)
+    elif len_split_FormName > 2:
+        _TypeForm = FormName.split('|')[1].strip()
+        _FormVersion = FormName.split('|')[2].strip()
+        Filename = os.path.basename(_source)
+        return saveXML(attach, Filename, _TypeForm, _FormVersion, _source)
