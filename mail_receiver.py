@@ -2,8 +2,10 @@ import logging
 import logging.handlers
 import os
 import sys
+import odoorpc
 
 from conf.config import MailReceiverConf as Config
+from conf.config import OdooRPCConf as OdooConfig
 from parsers.mailparser import MailParser
 from parsers.officetrack import parserOfficeTrack as parseOT
 from parsers.servicenow import parserServiceNow as parseSN
@@ -45,6 +47,18 @@ logfile.setFormatter(formatter)
 # Adicionando o arquivo de log ao logger
 logger.addHandler(logfile)
 
+def updateOdooMailIn(_event, **kwargs):
+    odooConfig = OdooConfig()
+    odoo = odoorpc.ODOO(odooConfig['xmlrpc_interface'], port = odooConfig['xmlrpc_port'])
+    odoo.login(odooConfig['db_name'], odooConfig['report_user'], odooConfig['report_password'])
+
+    Report = odoo.env['temos_report.base']
+    report_id = Report.search([('event_name', '=', _event), ('mail_in_status_id', '=', None)])
+
+    report = Report.browse(report_id)
+    print(_event, kwargs)
+    report.write(kwargs)
+
 
 def parsemail(_mailfile):
     source = _mailfile
@@ -54,8 +68,24 @@ def parsemail(_mailfile):
     logger.info('To: %s' % mail.to_)
     logger.info('Subject: %s' % mail.subject)
     if 'reports@latam.officeTrack.com' in mail.from_:
-        destination = parseOT(_mailfile, mail)
+        result = parseOT(_mailfile, mail)
+        _event = result[0]
+        destination = result[1]
         logger.info('OfficeTrack: Destination is %s' % destination)
+        if _event is not None:
+            mail_in_from = mail.from_
+            mail_in_to = mail.to_
+            mail_in_subject = mail.subject
+            mail_in_date = mail.date_mail
+            main_in_filename = destination
+            main_in_status_id = 1
+            params = {'mail_in_from': mail_in_from,
+                      'mail_in_to': mail_in_to,
+                      'mail_in_subject': mail_in_subject,
+                      'mail_in_date': mail_in_date.timetuple(),
+                      'main_in_filename': main_in_filename,
+                      'main_in_status_id': main_in_status_id}
+            updateOdooMailIn(_event, **params)
         os.rename(source, destination)
     elif 'semparar@service-now.com' in mail.from_:
         # destination = parseSN(_mailfile, mail)
